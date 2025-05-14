@@ -1,0 +1,208 @@
+```{r}
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+data <- read.csv("./Mental_Health_Lifestyle_Dataset.csv")
+data
+```
+
+
+
+```{r}
+head(data)
+```
+
+
+
+```{r}
+tail(data)
+```
+
+
+```{r}
+glimpse(data)
+```
+
+# Xem cấu trúc dữ liệu (kiểu dữ liệu của từng cột)
+```{r}
+str(data)
+```
+
+
+```{r}
+sum(is.na(data))
+```
+
+
+
+```{r}
+summary(data)
+```
+
+```{r}
+# Đếm số lượng giá trị NA ở mỗi cột
+sapply(data, function(x) sum(is.na(x)))
+```
+
+```{r}
+
+
+```
+
+
+```{r}
+# Đếm số lượng dòng có Age dưới 5
+num_under_5 <- sum(data$Age < 5)
+cat("Số người dưới 5 tuổi:", num_under_5, "\n")
+
+# Đếm số lượng dòng có Age trên 80
+num_over_80 <- sum(data$Age > 80)
+cat("Number over  80 years old:", num_over_80, "\n")
+
+```
+
+
+```{r}
+# Lấy các giá trị độc nhất trong cột Gender
+unique_genders <- unique(data$Gender)
+print(unique_genders)
+
+```
+
+
+```{r}
+# Tạo bảng đếm số lần xuất hiện của từng giới tính
+gender_count <- table(data$Gender)
+print(gender_count)
+
+```
+
+
+```{r}
+# Xem các giá trị duy nhất trong cột Exercise.Level
+unique_exercise <- unique(data$Exercise.Level)
+print(unique_exercise)
+
+# Tạo bảng số đếm cho từng mức độ tập luyện
+exercise_table <- table(data$Exercise.Level)
+print(exercise_table)
+
+```
+
+
+```{r}
+# Xem các giá trị duy nhất trong cột Diet.Type
+unique_diet <- unique(data$Diet.Type)
+print(unique_diet)
+
+# Tạo bảng đếm số lần xuất hiện của từng chế độ ăn
+diet_table <- table(data$Diet.Type)
+print(diet_table)
+
+```
+
+
+```{r}
+# Đếm số dòng có giá trị Sleep.Hours dưới 1
+num_below_1 <- sum(data$Sleep.Hours < 1)
+cat("Số dong co Sleep.Hours dưới 1:", num_below_1, "\n")
+
+work_per_week_1 <- sum(data$Work.Hours.per.Week < 1)
+print(work_per_week_1)
+
+screen_per_day_1 <- sum(data$Screen.Time.per.Day..Hours. < 1)
+print(screen_per_day_1)
+
+# Tính giá trị lớn nhất của cột Screen Time per Day (Hours)
+max_screen_time <- max(data$Screen.Time.per.Day..Hours., na.rm = TRUE)
+cat("Giá trị lớn nhất của Screen Time per Day (Hours):", max_screen_time, "\n")
+
+# Tính giá trị nhỏ nhất của cột Screen Time per Day (Hours)
+min_screen_time <- min(data$Screen.Time.per.Day..Hours., na.rm = TRUE)
+cat("Giá trị nhỏ nhất của Screen Time per Day (Hours):", min_screen_time, "\n")
+
+social_score_1 <- sum(data$Social.Interaction.Score < 1)
+cat("Social Interaction Score below 1: ", social_score_1)
+
+happy_score_1 <- sum(data$Happiness.Score < 1)
+cat("Happiness Score below 1:", happy_score_1)
+
+# Tính giá trị lớn nhất của cột Happiness.Score
+max_happy <- max(data$Happiness.Score, na.rm = TRUE)
+cat("Max Happiness.Score:", max_happy, "\n")
+
+# Tính giá trị nhỏ nhất của cột Happiness.Score
+min_happy <- min(data$Happiness.Score, na.rm = TRUE)
+cat("Min Happiness.Score:", min_happy, "\n")
+
+```
+
+
+
+```{r}
+# Xem các giá trị duy nhất trong cột Stress.Level
+unique_stress <- unique(data$Stress.Level)
+print(unique_stress)
+
+# Tạo bảng đếm số lần xuất hiện của từng giá trị trong cột Stress.Level
+stress_table <- table(data$Stress.Level)
+print(stress_table)
+
+```
+
+
+
+```{r}
+# Xem các giá trị duy nhất trong cột Mental.Health.Condition
+unique_mental <- unique(data$Mental.Health.Condition)
+print(unique_mental)
+
+# Tạo bảng đếm số lần xuất hiện cho từng giá trị trong cột Mental.Health.Condition
+mental_table <- table(data$Mental.Health.Condition)
+print(mental_table)
+
+```
+
+```{r}
+# Liệt kê các quốc gia duy nhất từ cột Country
+unique_countries <- unique(data$Country)
+print(unique_countries)
+
+# Đếm số dòng cho từng quốc gia trong cột Country
+country_counts <- table(data$Country)
+print(country_counts)
+
+```
+
+
+
+```{r}
+# Ví dụ chuyển đổi các cột sang factor
+data$Country       <- as.factor(data$Country)
+data$Gender        <- as.factor(data$Gender)
+data$`Exercise Level` <- as.factor(data$`Exercise Level`)
+data$`Diet Type`      <- as.factor(data$`Diet Type`)
+data$`Stress Level`   <- as.factor(data$`Stress Level`)
+data$`Mental Health`  <- as.factor(data$`Mental Health`)
+```
+
+
+```{r}
+boxplot(data$Age, main = "Boxplot của Age", col = "skyblue", xlab = "Age")
+```
+
+
+```{r}
+
+```
+
+```{r}
+write.csv(data, "Mental_Health_Lifestyle_Dataset_clean.csv", row.names = FALSE)
+
+```
+
+```{r}
+
+```
+
