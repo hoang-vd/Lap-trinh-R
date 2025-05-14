@@ -1,0 +1,1336 @@
+---
+title: "Phân tích dữ liệu Sức khỏe Tinh thần và Thói quen Lối sống (2019-2024)"
+author: "Nhóm 4"
+date: "2025-05-09"
+output:
+  word_document: default
+  html_document: default
+---
+
+# 1. Giới thiệu
+    Sức khỏe tinh thần ngày càng được công nhận là một khía cạnh thiết yếu của sức khỏe tổng thể, và mối liên hệ giữa sức khỏe tinh thần và thói quen lối sống đã thu hút sự chú ý đáng kể. Bộ dữ liệu "Sức khỏe Tinh thần và Thói quen Lối sống (2019-2024)" được thu thập toàn diện nhằm mục đích làm sáng tỏ cách các yếu tố lối sống khác nhau ảnh hưởng đến sức khỏe tinh thần. Bộ dữ liệu này ghi lại các khía cạnh quan trọng như thói quen tập thể dục, chế độ ăn uống, giấc ngủ, mức độ căng thẳng và tương tác xã hội, cùng với thông tin nhân khẩu học. Mục tiêu của dự án này là phân tích bộ dữ liệu này để hiểu rõ hơn về mối quan hệ phức tạp giữa sức khỏe tinh thần và thói quen lối sống trong giai đoạn 2019-2024.
+
+# 2. Tiền xử lí
+
+```{r}
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+data <- read.csv("./Mental_Health_Lifestyle_Dataset.csv")
+data
+```
+
+
+
+```{r}
+head(data)
+```
+
+
+
+```{r}
+tail(data)
+```
+
+
+```{r}
+glimpse(data)
+```
+
+# Xem cấu trúc dữ liệu (kiểu dữ liệu của từng cột)
+```{r}
+str(data)
+```
+
+
+```{r}
+sum(is.na(data))
+```
+
+
+
+```{r}
+summary(data)
+```
+
+```{r}
+# Đếm số lượng giá trị NA ở mỗi cột
+sapply(data, function(x) sum(is.na(x)))
+```
+
+```{r}
+# Đếm số lượng dòng có Age dưới 5
+num_under_5 <- sum(data$Age < 5)
+cat("Số người dưới 5 tuổi:", num_under_5, "\n")
+
+# Đếm số lượng dòng có Age trên 80
+num_over_80 <- sum(data$Age > 80)
+cat("Number over  80 years old:", num_over_80, "\n")
+
+```
+
+
+```{r}
+# Lấy các giá trị độc nhất trong cột Gender
+unique_genders <- unique(data$Gender)
+print(unique_genders)
+
+```
+
+
+```{r}
+# Tạo bảng đếm số lần xuất hiện của từng giới tính
+gender_count <- table(data$Gender)
+print(gender_count)
+
+```
+
+
+```{r}
+# Xem các giá trị duy nhất trong cột Exercise.Level
+unique_exercise <- unique(data$Exercise.Level)
+print(unique_exercise)
+
+# Tạo bảng số đếm cho từng mức độ tập luyện
+exercise_table <- table(data$Exercise.Level)
+print(exercise_table)
+
+```
+
+
+```{r}
+# Xem các giá trị duy nhất trong cột Diet.Type
+unique_diet <- unique(data$Diet.Type)
+print(unique_diet)
+
+# Tạo bảng đếm số lần xuất hiện của từng chế độ ăn
+diet_table <- table(data$Diet.Type)
+print(diet_table)
+
+```
+
+
+```{r}
+# Đếm số dòng có giá trị Sleep.Hours dưới 1
+num_below_1 <- sum(data$Sleep.Hours < 1)
+cat("Số dong co Sleep.Hours dưới 1:", num_below_1, "\n")
+
+work_per_week_1 <- sum(data$Work.Hours.per.Week < 1)
+print(work_per_week_1)
+
+screen_per_day_1 <- sum(data$Screen.Time.per.Day..Hours. < 1)
+print(screen_per_day_1)
+
+# Tính giá trị lớn nhất của cột Screen Time per Day (Hours)
+max_screen_time <- max(data$Screen.Time.per.Day..Hours., na.rm = TRUE)
+cat("Giá trị lớn nhất của Screen Time per Day (Hours):", max_screen_time, "\n")
+
+# Tính giá trị nhỏ nhất của cột Screen Time per Day (Hours)
+min_screen_time <- min(data$Screen.Time.per.Day..Hours., na.rm = TRUE)
+cat("Giá trị nhỏ nhất của Screen Time per Day (Hours):", min_screen_time, "\n")
+
+social_score_1 <- sum(data$Social.Interaction.Score < 1)
+cat("Social Interaction Score below 1: ", social_score_1)
+
+happy_score_1 <- sum(data$Happiness.Score < 1)
+cat("Happiness Score below 1:", happy_score_1)
+
+# Tính giá trị lớn nhất của cột Happiness.Score
+max_happy <- max(data$Happiness.Score, na.rm = TRUE)
+cat("Max Happiness.Score:", max_happy, "\n")
+
+# Tính giá trị nhỏ nhất của cột Happiness.Score
+min_happy <- min(data$Happiness.Score, na.rm = TRUE)
+cat("Min Happiness.Score:", min_happy, "\n")
+
+```
+
+
+
+```{r}
+# Xem các giá trị duy nhất trong cột Stress.Level
+unique_stress <- unique(data$Stress.Level)
+print(unique_stress)
+
+# Tạo bảng đếm số lần xuất hiện của từng giá trị trong cột Stress.Level
+stress_table <- table(data$Stress.Level)
+print(stress_table)
+
+```
+
+
+
+```{r}
+# Xem các giá trị duy nhất trong cột Mental.Health.Condition
+unique_mental <- unique(data$Mental.Health.Condition)
+print(unique_mental)
+
+# Tạo bảng đếm số lần xuất hiện cho từng giá trị trong cột Mental.Health.Condition
+mental_table <- table(data$Mental.Health.Condition)
+print(mental_table)
+
+```
+
+```{r}
+# Liệt kê các quốc gia duy nhất từ cột Country
+unique_countries <- unique(data$Country)
+print(unique_countries)
+
+# Đếm số dòng cho từng quốc gia trong cột Country
+country_counts <- table(data$Country)
+print(country_counts)
+
+```
+
+
+
+```{r}
+
+data$Country       <- as.factor(data$Country)
+data$Gender        <- as.factor(data$Gender)
+data$Exercise.Level <- as.factor(data$Exercise.Level)
+data$Diet.Type <- as.factor(data$Diet.Type)
+data$Stress.Level   <- as.factor(data$Stress.Level)
+
+```
+
+
+```{r}
+boxplot(data$Age, main = "Boxplot của Age", col = "skyblue", xlab = "Age")
+```
+
+
+```{r}
+write.csv(data, "Mental_Health_Lifestyle_Dataset_clean.csv", row.names = FALSE)
+
+```
+
+# 3. Thống kê mô tả
+## 3.1. Thống kê mô tả cho các biến định lượng
+
+```{r}
+library(psych)
+
+numeric_cols <- data %>% select(where(is.numeric))
+describe(numeric_cols)
+numeric_cols %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 30, fill = "#feb24c", color = "white") +
+  facet_wrap(~name, scales = "free", ncol = 2) +
+  theme_minimal() +
+  labs(title = "Phân phối các biến định lượng", x = "Giá trị", y = "Tần số")
+```
+
+**Nhận xét chung**:  
+Một số biến (ví dụ `Sleep.Hours`) có phân phối lệch phải, một số biến (ví dụ `Age`, `Work.Hours.per.Week`) phân bố tương đối đều.  
+Cần lưu ý outlier (nếu có) trước khi đưa vào mô hình phân tích sau này.
+
+### Tuổi (Age)
+
+```{r}
+summary(data$Age)
+ggplot(data, aes(x = Age)) +
+  geom_histogram(bins = 20, fill = "#74c476", color = "white") +
+  theme_minimal() +
+  labs(title = "Phân phối tuổi", x = "Tuổi", y = "Tần số")
+```
+
+**Nhận xét**:  
+Min = 18, Max = 64, Trung bình ~ 41.2, Trung vị = 41.  
+Biểu đồ histogram cho thấy tần suất phân bố khá đều từ 18 đến 64, không có nhóm tuổi nào chiếm ưu thế rõ rệt.
+
+### Giờ ngủ mỗi đêm (Sleep Hours)
+
+```{r}
+summary(data$Sleep.Hours)
+ggplot(data, aes(x = Sleep.Hours)) +
+  geom_histogram(bins = 20, fill = "#fec44f", color = "white") +
+  theme_minimal() +
+  labs(title = "Phân phối giờ ngủ mỗi đêm", x = "Giờ ngủ", y = "Tần số")
+```
+
+**Nhận xét**:  
+Min = 1.4, Max = 11.3, Trung bình ~ 6.48, Trung vị = 6.5 (giờ).  
+Đa số người dùng ngủ khoảng 6-7 giờ, phân phối có xu hướng trái (có đuôi phải dài) do một số cá nhân ngủ nhiều (>9 giờ).
+
+### Số giờ làm việc trong tuần (Work Hours per Week)
+
+```{r}
+summary(data$Work.Hours.per.Week)
+ggplot(data, aes(x = Work.Hours.per.Week)) +
+  geom_histogram(bins = 20, fill = "#fd8d3c", color = "white") +
+  theme_minimal() +
+  labs(title = "Phân phối số giờ làm việc mỗi tuần", x = "Giờ làm việc mỗi tuần", y = "Tần số")
+```
+
+**Nhận xét**:  
+Min = 20, Max = 59, Trung bình ~ 39.5, Trung vị = 39 (giờ/tuần).  
+Phân phối gần như đều trên toàn khoảng từ 20 đến 59 giờ, không có xu hướng lệch mạnh.
+
+### Thời gian sử dụng màn hình mỗi ngày (Screen Time per Day)
+
+```{r}
+summary(data$Screen.Time.per.Day..Hours.)
+ggplot(data, aes(x = Screen.Time.per.Day..Hours.)) +
+  geom_histogram(bins = 20, fill = "#f03b20", color = "white") +
+  theme_minimal() +
+  labs(title = "Phân phối thời gian sử dụng màn hình mỗi ngày", x = "Giờ sử dụng màn hình", y = "Tần số")
+```
+
+**Nhận xét**:  
+Min = 2.0, Max = 8.0, Trung bình ~ 5.09, Trung vị = 5.1 (giờ).  
+Thời gian sử dụng màn hình phần lớn dao động 4–8 giờ/ngày, cao điểm tập trung ở khoảng 7–8 giờ, ít người dùng dưới 3 giờ.
+
+### Điểm tương tác xã hội (Social Interaction Score)
+
+```{r}
+summary(data$Social.Interaction.Score)
+ggplot(data, aes(x = Social.Interaction.Score)) +
+  geom_histogram(bins = 20, fill = "#ae017e", color = "white") +
+  theme_minimal() +
+  labs(title = "Phân phối điểm tương tác xã hội", x = "Điểm tương tác xã hội", y = "Tần số")
+```
+
+**Nhận xét**:  
+Min = 1, Max = 10, Trung bình ~ 5.47, Trung vị = 5.5.  
+Điểm tương tác xã hội phân bố khá đều trên thang điểm 1–10, không có xu hướng tập trung hay lệch rõ.
+
+### Điểm hạnh phúc (Happiness Score)
+
+```{r}
+summary(data$Happiness.Score)
+ggplot(data, aes(x = Happiness.Score)) +
+  geom_histogram(bins = 20, fill = "#6a51a3", color = "white") +
+  theme_minimal() +
+  labs(title = "Phân phối điểm hạnh phúc", x = "Điểm hạnh phúc", y = "Tần số")
+```
+
+**Nhận xét**:  
+Min = 1, Max = 10, Trung bình ~ 5.40, Trung vị = 5.4.  
+Điểm hạnh phúc cũng phân bố khá đều trên toàn bộ khoảng 1–10, không có xu hướng lệch mạnh.
+
+## 3.2. Thống kê mô tả cho các biến định tính
+
+### Tình trạng sức khỏe tâm thần (Mental Health Condition)
+
+```{r}
+# Chuyển sang factor nếu cần
+data$Mental.Health.Condition <- as.factor(data$Mental.Health.Condition)
+
+data %>%
+  group_by(Mental.Health.Condition) %>%
+  summarise(Count = n()) %>%
+  mutate(Percent = round(100 * Count / sum(Count), 1))
+ggplot(data, aes(x = Mental.Health.Condition)) +
+  geom_bar(fill = "#2c7fb8") +
+  theme_minimal() +
+  labs(title = "Phân bố tình trạng sức khỏe tâm thần", x = "Tình trạng sức khỏe tâm thần", y = "Tần số") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+**Nhận xét**:  
+Có 3000 người tham gia với 5 loại tình trạng sức khỏe tâm thần. Tần suất phân bố khá đều: Anxiety chiếm khoảng 20.9%, PTSD ~20.8%, None ~19.8%, Depression ~19.3%, Bipolar ~19.1%.  
+Không có loại nào chiếm ưu thế áp đảo; phần trăm của mỗi loại dao động quanh 19–21%.
+
+### Quốc gia (Country)
+
+```{r}
+data %>%
+  group_by(Country) %>%
+  summarise(Count = n()) %>%
+  mutate(Percent = round(100 * Count / sum(Count), 1)) %>%
+  arrange(desc(Count))
+ggplot(data, aes(x = Country)) +
+  geom_bar(fill = "#2c7fb8") +
+  theme_minimal() +
+  labs(title = "Phân bố theo quốc gia", x = "Quốc gia", y = "Tần số") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+**Nhận xét**:  
+Nhóm quốc gia lớn nhất: USA (14.9%), nhỏ nhất: Germany (13.5%). Các quốc gia khác (Japan, Australia, India, Canada, Brazil) đều nằm giữa với ~13.8–14.6%.  
+Phân phối không chênh lệch nhiều giữa các quốc gia (trong khoảng 13.5–14.9%).
+
+### Giới tính (Gender)
+
+```{r}
+data %>%
+  group_by(Gender) %>%
+  summarise(Count = n()) %>%
+  mutate(Percent = round(100 * Count / sum(Count), 1))
+ggplot(data, aes(x = Gender)) +
+  geom_bar(fill = "#2c7fb8") +
+  theme_minimal() +
+  labs(title = "Phân bố theo giới tính", x = "Giới tính", y = "Tần số")
+```
+
+**Nhận xét**:  
+Female (34.1%) là nhóm nhiều nhất, tiếp theo là Other (33.2%) và Male (32.7%).  
+Tỉ lệ giữa các giới tính không khác biệt lớn (đều khoảng 32–34%).
+
+### Mức độ tập luyện (Exercise Level)
+
+```{r}
+data %>%
+  group_by(Exercise.Level) %>%
+  summarise(Count = n()) %>%
+  mutate(Percent = round(100 * Count / sum(Count), 1))
+ggplot(data, aes(x = Exercise.Level)) +
+  geom_bar(fill = "#2c7fb8") +
+  theme_minimal() +
+  labs(title = "Phân bố theo mức độ tập luyện", x = "Mức độ tập luyện", y = "Tần số")
+```
+
+**Nhận xét**:  
+Low (34.4%), Moderate (33.3%), High (32.3%) là tỉ lệ tương ứng của các mức độ tập luyện.  
+Phân bố tương đối cân bằng, không có nhóm tập luyện nào chiếm ưu thế vượt trội.
+
+### Loại chế độ ăn (Diet Type)
+
+```{r}
+data %>%
+  group_by(Diet.Type) %>%
+  summarise(Count = n()) %>%
+  mutate(Percent = round(100 * Count / sum(Count), 1))
+ggplot(data, aes(x = Diet.Type)) +
+  geom_bar(fill = "#2c7fb8") +
+  theme_minimal() +
+  labs(title = "Phân bố theo loại chế độ ăn", x = "Chế độ ăn", y = "Tần số") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+**Nhận xét**:  
+Nhóm ăn Junk Food (21.2%) chiếm tỷ lệ cao nhất, tiếp theo là Balanced (20.8%).  
+Các nhóm Vegetarian (19.7%), Vegan (19.1%) và Keto (19.1%) có tỉ lệ thấp hơn tương ứng.  
+Khoảng 21% người được khảo sát theo chế độ ăn không lành mạnh nhất (Junk Food).
+
+### Mức độ căng thẳng (Stress Level)
+
+```{r}
+data %>%
+  group_by(Stress.Level) %>%
+  summarise(Count = n()) %>%
+  mutate(Percent = round(100 * Count / sum(Count), 1))
+ggplot(data, aes(x = Stress.Level)) +
+  geom_bar(fill = "#2c7fb8") +
+  theme_minimal() +
+  labs(title = "Phân bố theo mức độ căng thẳng", x = "Mức độ căng thẳng", y = "Tần số")
+```
+
+**Nhận xét**:  
+Các mức độ căng thẳng Low (33.6%), High (33.4%) và Moderate (33.0%) chia đều gần như 1/3.  
+Không có mức căng thẳng nào chiếm áp đảo; số lượng người khảo sát ở mỗi mức rất tương đương.
+
+## 5. Phân tích mối quan hệ giữa các biến định lượng
+
+```{r}
+library(GGally)
+numeric_cols %>% ggpairs(progress = FALSE)
+```
+
+**Nhận xét**:  
+Không có mối tương quan tuyến tính mạnh giữa các biến định lượng. Ví dụ, các hệ số tương quan đều gần 0 (như `Age` và `Sleep.Hours` gần 0).  
+Có xu hướng yếu: `Age` tương quan âm nhỏ với một số chỉ số khác nhưng giá trị tương quan rất thấp.  
+Nhìn chung, các biến định lượng phân phối độc lập tương đối, không có cặp biến nào cho thấy liên hệ rõ ràng.
+
+## 6. Tổng kết
+
+Dữ liệu đã được xử lý sạch và chuẩn hóa, sẵn sàng cho phân tích tiếp theo.  
+Kết quả mô tả cung cấp cái nhìn ban đầu về đặc điểm của từng biến (phân bố, xu hướng), hỗ trợ trong việc lựa chọn mô hình hoặc các phân nhóm tiếp theo.
+
+# 4. Thống kê suy diễn
+## 4.1 Ước lượng tham số
+### 4.1.1. Ước lượng trung bình
+
+```{r estimates}
+# Trung bình và khoảng tin cậy
+# Danh sách các cột cần ước lượng
+# Cài thư viện nếu chưa có
+#install.packages("EnvStats")
+library(EnvStats)
+
+vars <- c("Age", 
+          "Sleep.Hours", 
+          "Work.Hours.per.Week", 
+          "Screen.Time.per.Day..Hours.", 
+          "Social.Interaction.Score", 
+          "Happiness.Score")
+
+# Duyệt qua từng biến và thực hiện t-test
+for (var in vars) {
+  cat("\n-------------------------------\n")
+  cat("Ước lượng trung bình cho:", var, "\n")
+  result <- t.test(data[[var]])
+  print(result)
+}
+
+```
+
+Nhận xét và kết luận
+1. Age(Tuổi)
+- Ước lượng trung bình: 41.23 năm
+- Khoảng tin cậy 95%: [40.75, 41.71]
+--> Trung bình tuổi của mẫu là khoảng 41, với khoảng tin cậy hẹp (chênh lệch khoảng 0.96), cho thấy ước lượng này có độ chính xác cao. Điều này cho thấy rằng nhóm người được khảo sát chủ yếu thuộc độ tuổi trung niên.
+
+2. Sleep.Hours (Số giờ ngủ mỗi đêm)
+- Ước lượng trung bình: 6.48 giờ
+- Khoảng tin cậy 95%: [6.42, 6.53]
+--> Người trong mẫu trung bình ngủ khoảng 6.5 giờ mỗi đêm, thấp hơn mức khuyến nghị 7-9 giờ cho người trưởng thành. Khoảng tin cậy rất hẹp (chênh lệch 0.11 giờ), cho thấy kết quả đáng tin cậy. Điều này có thể gợi ý rằng nhóm này có nguy cơ thiếu ngủ, một yếu tố cần xem xét nếu nghiên cứu liên quan đến sức khỏe hoặc năng suất.
+
+3. Work.Hours.per.Week (Số giờ làm việc mỗi tuần)
+- Ước lượng trung bình: 39.47 giờ
+- Khoảng tin cậy 95%: [39.06, 39.88]
+--> Trung bình thời gian làm việc mỗi tuần là gần 40 giờ, phù hợp với tiêu chuẩn của công việc toàn thời gian ở nhiều quốc gia. Khoảng tin cậy hẹp (chênh lệch 0.82 giờ) cho thấy sự nhất quán trong lịch trình làm việc của mẫu. Điều này phản ánh một lối sống lao động khá điển hình.
+
+4. Screen.Time.per.Day..Hours. (Thời gian sử dụng màn hình mỗi ngày)
+- Ước lượng trung bình: 5.09 giờ
+- Khoảng tin cậy 95%: [5.03, 5.15]
+--> Trung bình mỗi ngày, người trong mẫu dành khoảng 5 giờ cho màn hình (có thể bao gồm công việc, giải trí, hoặc các hoạt động khác). Khoảng tin cậy hẹp (chênh lệch 0.12 giờ) cho thấy thói quen sử dụng màn hình khá đồng đều. Đây là một con số đáng kể, chiếm phần lớn thời gian thức trong ngày, và có thể liên quan đến các yếu tố như sức khỏe mắt hoặc tinh thần.
+
+5. Social.Interaction.Score (Điểm tương tác xã hội)
+- Ước lượng trung bình: 5.47
+- Khoảng tin cậy 95%: [5.38, 5.56]
+--> Giả sử thang điểm từ 0-10, mức trung bình 5.47 cho thấy mức độ tương tác xã hội ở mức trung bình. Khoảng tin cậy hẹp (chênh lệch 0.18) phản ánh độ chính xác cao. Kết quả này cho thấy nhóm người này có mức độ giao tiếp xã hội vừa phải, không quá cô lập nhưng cũng không quá năng động.
+
+6. Happiness.Score (Điểm hạnh phúc)
+- Ước lượng trung bình: 5.40
+- Khoảng tin cậy 95%: [5.30, 5.49]
+-->Với giả định thang điểm từ 0-10, điểm hạnh phúc trung bình 5.40 cũng nằm ở mức trung bình, cho thấy mức độ hài lòng với cuộc sống ở mức vừa phải. Khoảng tin cậy hẹp (chênh lệch 0.19) cho thấy ước lượng đáng tin cậy. Điều này có thể phản ánh một trạng thái cảm xúc ổn định nhưng không nổi bật.
+
+### 4.1.2. Ước lượng tỉ lệ
+
+```{r}
+# Các cột phân loại có thể ước lượng tỉ lệ
+cat_vars <- c("Mental.Health.Condition", "Diet.Type", "Stress.Level")
+
+# Hàm tính tỉ lệ và khoảng tin cậy 95% cho từng nhóm trong biến phân loại
+for (var in cat_vars) {
+  cat("\n===============================\n")
+  cat("Ước lượng tỉ lệ cho biến:", var, "\n")
+  
+  tbl <- table(data[[var]])
+  print(tbl)
+  
+  for (level in names(tbl)) {
+    count <- tbl[[level]]
+    total <- sum(tbl)
+    cat("\n- Mức:", level, "\n")
+    cat("Số lượng:", count, "/", total, "\n")
+    prop <- prop.test(count, total, conf.level = 0.95)
+    print(prop)
+  }
+}
+```
+
+Nhận xét và kết luận
+Ước lượng tỉ lệ và khoảng tin cậy
+Anxiety:
+Tỉ lệ: 628/3000 = 20.93%
+Khoảng tin cậy 95%: [19.50%, 22.44%]
+P-value: 3.14e-222
+Bipolar:
+Tỉ lệ: 573/3000 = 19.10%
+Khoảng tin cậy 95%: [17.72%, 20.56%]
+P-value: 6.91e-251
+Depression:
+Tỉ lệ: 580/3000 = 19.33%
+Khoảng tin cậy 95%: [17.94%, 20.80%]
+P-value: 3.84e-247
+None:
+Tỉ lệ: 595/3000 = 19.83%
+Khoảng tin cậy 95%: [18.43%, 21.32%]
+P-value: 3.26e-239
+PTSD:
+Tỉ lệ: 624/3000 = 20.80%
+Khoảng tin cậy 95%: [19.37%, 22.31%]
+P-value: 2.97e-224
+
+- Tỉ lệ ước lượng cho mỗi mức dao động từ 19.10% (Bipolar) đến 20.93% (Anxiety), khá đồng đều và gần mức trung bình lý thuyết 20% (1/5) nếu phân bố đều giữa 5 mức.
+- Khoảng tin cậy 95% của từng mức khá hẹp (chênh lệch khoảng 2.5-3%), cho thấy ước lượng tỉ lệ có độ chính xác cao, nhờ kích thước mẫu lớn (3000).
+- P-value rất nhỏ (gần 0) cho tất cả các mức, bác bỏ giả thuyết null (p = 0.5). Điều này hợp lý vì với 5 mức, tỉ lệ mỗi mức không thể gần 50%, mà dự kiến chỉ khoảng 20%.
+
+### 4.1.3. Ước lượng phương sai
+
+```{r}
+# Danh sách các cột định lượng phù hợp
+numeric_vars <- c("Age", 
+                  "Sleep.Hours", 
+                  "Work.Hours.per.Week", 
+                  "Screen.Time.per.Day..Hours.", 
+                  "Social.Interaction.Score", 
+                  "Happiness.Score")
+
+# Ước lượng phương sai cho từng biến
+for (var in numeric_vars) {
+  cat("\n===============================\n")
+  cat("Ước lượng phương sai cho:", var, "\n")
+  
+  # Phương sai mẫu (điểm)
+  s2 <- var(data[[var]], na.rm = TRUE)
+  cat("Phương sai mẫu:", round(s2, 4), "\n")
+  
+  # Khoảng tin cậy 95% cho phương sai
+  ci_result <- varTest(data[[var]], conf.level = 0.95)
+  cat("Khoảng tin cậy 95% cho phương sai:\n")
+  print(ci_result$conf.int)
+}
+```
+
+Nhận xét và kết luận
+1. Biến Age (Tuổi):
+Phương sai mẫu: 180.3224
+Khoảng tin cậy 95%: [171.5325, 189.8090]
+Phương sai mẫu của biến Age là 180.3224, cho thấy độ biến thiên của tuổi trong mẫu khá lớn. Khoảng tin cậy 95% cho phương sai nằm trong khoảng từ 171.5325 đến 189.8090, với độ rộng là 18.2765 (189.8090 - 171.5325). Điều này chỉ ra rằng ước lượng phương sai của biến tuổi có mức độ chính xác khá tốt, vì khoảng tin cậy không quá rộng.
+
+2. Biến Sleep.Hours (Số giờ ngủ):
+Phương sai mẫu: 2.2496
+Khoảng tin cậy 95%: [2.139940, 2.367947]
+Phương sai mẫu của biến Sleep.Hours là 2.2496, cho thấy độ biến thiên của số giờ ngủ trong mẫu là khá nhỏ. Khoảng tin cậy 95% nằm trong khoảng từ 2.139940 đến 2.367947, với độ rộng chỉ khoảng 0.227947. Khoảng tin cậy hẹp này cho thấy ước lượng phương sai của số giờ ngủ rất chính xác.
+
+3. Biến Work.Hours.per.Week (Số giờ làm việc mỗi tuần):
+Phương sai mẫu: 131.1359
+Khoảng tin cậy 95%: [124.7437, 138.0349]
+Phương sai mẫu của biến Work.Hours.per.Week là 131.1359, phản ánh độ biến thiên lớn trong số giờ làm việc mỗi tuần. Khoảng tin cậy 95% nằm trong khoảng từ 124.7437 đến 138.0349, với độ rộng là 13.2912. Khoảng tin cậy này cũng tương đối hẹp, cho thấy ước lượng phương sai của biến này là khá chính xác.
+
+4. Biến Screen.Time.per.Day..Hours. (Thời gian sử dụng màn hình mỗi ngày):
+Phương sai mẫu: 3.0528
+Khoảng tin cậy 95%: [2.904007, 3.213424]
+Phương sai mẫu của biến Screen.Time.per.Day..Hours. là 3.0528, cho thấy độ biến thiên của thời gian sử dụng màn hình mỗi ngày là khá nhỏ. Khoảng tin cậy 95% nằm trong khoảng từ 2.904007 đến 3.213424, với độ rộng là 0.309417. Điều này chứng tỏ ước lượng phương sai của biến này rất chính xác do khoảng tin cậy hẹp.
+
+5. Biến Social.Interaction.Score (Điểm tương tác xã hội):
+Phương sai mẫu: 6.5717
+Khoảng tin cậy 95%: [6.251357, 6.917428]
+Phương sai mẫu của biến Social.Interaction.Score là 6.5717, cho thấy độ biến thiên của điểm tương tác xã hội trong mẫu ở mức trung bình đến lớn. Khoảng tin cậy 95% nằm trong khoảng từ 6.251357 đến 6.917428, với độ rộng là 0.666071. Khoảng tin cậy hẹp này cho thấy ước lượng phương sai là khá chính xác.
+
+6. Biến Happiness.Score (Điểm hạnh phúc):
+Phương sai mẫu: 6.5413
+Khoảng tin cậy 95%: [6.222464, 6.885457]
+Phương sai mẫu của biến Happiness.Score là 6.5413, phản ánh độ biến thiên trung bình đến lớn trong điểm hạnh phúc. Khoảng tin cậy 95% nằm trong khoảng từ 6.222464 đến 6.885457, với độ rộng là 0.663043. Điều này cũng cho thấy ước lượng phương sai của biến này khá chính xác.
+
+## 4.2 Kiểm định giả thuyết
+### 4.2.1 Kiểm định t độc lập 
+Kiểm định t độc lập (two-sample t-test) được sử dụng để so sánh trung bình của hai nhóm độc lập về một biến số định lượng.
+
+```{r}
+
+# Đảm bảo đã tải các thư viện cần thiết
+library(dplyr) # Thư viện để thao tác dữ liệu một cách dễ dàng
+library(rstatix) # Thư viện cung cấp các hàm thống kê tiện lợi
+
+# Thực hiện kiểm định t độc lập cho từng biến số
+
+# Kiểm định t độc lập để so sánh giá trị trung bình của biến 'Sleep.Hours' giữa các nhóm trong cột 'Gender'
+print("Thực hiện kiểm định t độc lập cho biến Sleep.Hours theo Gender:")
+t_test_sleep_gender <- data %>%
+  t_test(Sleep.Hours ~ Gender)
+print(t_test_sleep_gender) # In kết quả kiểm định t cho biến 'Sleep.Hours' theo 'Gender'
+
+# Kiểm định t độc lập để so sánh giá trị trung bình của biến 'Work.Hours.per.Week' giữa các nhóm trong cột 'Gender'
+print("Thực hiện kiểm định t độc lập cho biến Work.Hours.per.Week theo Gender:")
+t_test_work_hours_gender <- data %>%
+  t_test(Work.Hours.per.Week ~ Gender)
+print(t_test_work_hours_gender) # In kết quả kiểm định t cho biến 'Work.Hours.per.Week' theo 'Gender'
+
+# Kiểm định t độc lập để so sánh giá trị trung bình của biến 'Screen.Time.per.Day..Hours.' giữa các nhóm trong cột 'Gender'
+print("Thực hiện kiểm định t độc lập cho biến Screen.Time.per.Day..Hours. theo Gender:")
+t_test_screen_time_gender <- data %>%
+  t_test(Screen.Time.per.Day..Hours. ~ Gender)
+print(t_test_screen_time_gender) # In kết quả kiểm định t cho biến 'Screen.Time.per.Day..Hours.' theo 'Gender'
+
+# Kiểm định t độc lập để so sánh giá trị trung bình của biến 'Social.Interaction.Score' giữa các nhóm trong cột 'Gender'
+print("Thực hiện kiểm định t độc lập cho biến Social.Interaction.Score theo Gender:")
+t_test_social_interaction_gender <- data %>%
+  t_test(Social.Interaction.Score ~ Gender)
+print(t_test_social_interaction_gender) # In kết quả kiểm định t cho biến 'Social.Interaction.Score' theo 'Gender'
+
+# Kiểm định t độc lập để so sánh giá trị trung bình của biến 'Happiness.Score' giữa các nhóm trong cột 'Gender'
+print("Thực hiện kiểm định t độc lập cho biến Happiness.Score theo Gender:")
+t_test_happiness_gender <- data %>%
+  t_test(Happiness.Score ~ Gender)
+print(t_test_happiness_gender) # In kết quả kiểm định t cho biến 'Happiness.Score' theo 'Gender'
+
+
+```
+Nhận xét và kết luận
+1. Biến Sleep.Hours (Số giờ ngủ):
+Female vs. Male:
+Statistic: 1.120670
+p-value: 0.263
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về số giờ ngủ giữa Female và Male.
+
+Female vs. Other:
+Statistic: 0.944928
+p-value: 0.345
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về số giờ ngủ giữa Female và Other.
+
+Male vs. Other:
+Statistic: -0.188343
+p-value: 0.851
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về số giờ ngủ giữa Male và Other.
+
+Nhận xét: Các nhóm giới tính có thói quen ngủ tương tự nhau, không có sự khác biệt đáng kể.
+
+2. Biến Work.Hours.per.Week (Số giờ làm việc mỗi tuần):
+Female vs. Male:
+Statistic: -0.83116605
+p-value: 0.406
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về số giờ làm việc giữa Female và Male.
+
+Female vs. Other:
+Statistic: -0.91070774
+p-value: 0.363
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về số giờ làm việc giữa Female và Other.
+
+Male vs. Other:
+Statistic: -0.07648105
+p-value: 0.939
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về số giờ làm việc giữa Male và Other.
+
+Nhận xét: Số giờ làm việc mỗi tuần không khác biệt đáng kể giữa các nhóm giới tính.
+
+3. Biến Screen.Time.per.Day..Hours. (Thời gian sử dụng màn hình mỗi ngày):
+Female vs. Male:
+Statistic: 0.492053
+p-value: 0.623
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về thời gian sử dụng màn hình giữa Female và Male.
+
+Female vs. Other:
+Statistic: 1.669464
+p-value: 0.095
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về thời gian sử dụng màn hình giữa Female và Other (mặc dù p-value gần ngưỡng 0.05).
+
+Male vs. Other:
+Statistic: 1.165084
+p-value: 0.244
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về thời gian sử dụng màn hình giữa Male và Other.
+
+Nhận xét: Thói quen sử dụng màn hình mỗi ngày là tương đương giữa các nhóm giới tính.
+
+4. Biến Social.Interaction.Score (Điểm tương tác xã hội):
+Female vs. Male:
+Statistic: -0.2047306
+p-value: 0.838
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về điểm tương tác xã hội giữa Female và Male.
+
+Female vs. Other:
+Statistic: -0.2661092
+p-value: 0.790
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về điểm tương tác xã hội giữa Female và Other.
+
+Male vs. Other:
+Statistic: -0.0567433
+p-value: 0.955
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về điểm tương tác xã hội giữa Male và Other.
+
+Nhận xét: Mức độ tương tác xã hội giữa các nhóm giới tính là tương đương.
+
+5. Biến Happiness.Score (Điểm hạnh phúc):
+Female vs. Male:
+Statistic: -1.6405468
+p-value: 0.101
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về điểm hạnh phúc giữa Female và Male.
+
+Female vs. Other:
+Statistic: -1.2255010
+p-value: 0.221
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về điểm hạnh phúc giữa Female và Other.
+
+Male vs. Other:
+Statistic: 0.4108979
+p-value: 0.681
+Kết quả: p > 0.05 → Không có sự khác biệt đáng kể về điểm hạnh phúc giữa Male và Other.
+
+Nhận xét: Mức độ hạnh phúc không khác biệt đáng kể giữa các nhóm giới tính.
+
+Kết luận: Dựa trên các kiểm định t độc lập, không có sự khác biệt đáng kể về mặt thống kê giữa các nhóm giới tính (Female, Male, Other) đối với các biến Sleep.Hours, Work.Hours.per.Week, Screen.Time.per.Day..Hours., Social.Interaction.Score, và Happiness.Score. Điều này cho thấy rằng giới tính không phải là yếu tố quyết định đến các đặc điểm như tuổi, thói quen ngủ, giờ làm việc, thời gian sử dụng màn hình, mức độ tương tác xã hội hay hạnh phúc trong mẫu dữ liệu này.
+
+### 4.2.2 Kiểm định ANOVA 
+ANOVA (phân tích phương sai) được dùng để so sánh trung bình của nhiều nhóm định tính với biến phụ thuộc liên tục. Giả thuyết không (H₀) của ANOVA là “không có sự khác biệt giữa các trung bình nhóm”. Giả thuyết đối (H₁) là có ít nhất một cặp nhóm khác biệt. Để áp dụng ANOVA, các giả định chính cần kiểm tra gồm: dữ liệu độc lập, phân phối chuẩn trong mỗi nhóm và phương sai giữa các nhóm đồng nhất
+
+```{r}
+
+# Danh sách cặp biến: y ~ x (y = biến định lượng, x = biến nhóm ≥ 3 mức)
+anova_pairs <- list(
+  c("Happiness.Score", "Diet.Type"),
+  c("Happiness.Score", "Exercise.Level"),
+  c("Happiness.Score", "Stress.Level"),
+  c("Happiness.Score", "Mental.Health.Condition"),
+  c("Sleep.Hours", "Exercise.Level"),
+  c("Sleep.Hours", "Mental.Health.Condition"),
+  c("Screen.Time.per.Day..Hours.", "Diet.Type"),
+  c("Work.Hours.per.Week", "Mental.Health.Condition"),
+  c("Social.Interaction.Score", "Stress.Level"),
+  c("Age", "Exercise.Level")
+)
+
+# Chạy ANOVA cho từng cặp và in kết quả
+for (pair in anova_pairs) {
+  y <- pair[1]
+  x <- pair[2]
+  cat("\n====================================\n")
+  cat("ANOVA kiểm định:", y, "~", x, "\n")
+  
+  # Tạo công thức
+  formula <- as.formula(paste(y, "~", x))
+  
+  # Thực hiện ANOVA
+  model <- aov(formula, data = data)
+  print(summary(model))
+}
+
+```
+Nhận xét và kết luận
+1. Happiness.Score ~ Diet.Type
+- Kết quả:
+F-value: 2.5308
+p-value: 0.03862 (có dấu *)
+- Nhận xét:
+Giá trị p-value = 0.03862 < 0.05, cho thấy có sự khác biệt đáng kể về mặt thống kê về điểm hạnh phúc (Happiness.Score) giữa các nhóm chế độ ăn (Diet.Type). Điều này ngụ ý rằng chế độ ăn có ảnh hưởng đến mức độ hạnh phúc của các cá nhân trong mẫu.
+
+2. Happiness.Score ~ Exercise.Level
+- Kết quả:
+F-value: 2.6593
+p-value: 0.07016 (có dấu .)
+- Nhận xét:
+Giá trị p-value = 0.07016 > 0.05, nhưng rất gần với ngưỡng ý nghĩa thống kê (α = 0.05). Điều này cho thấy có một xu hướng khác biệt về điểm hạnh phúc giữa các mức độ tập thể dục (Exercise.Level), nhưng không đủ mạnh để kết luận có sự khác biệt đáng kể ở mức α = 0.05. Có thể cần thêm dữ liệu hoặc nghiên cứu sâu hơn để làm rõ mối quan hệ này.
+
+3. Happiness.Score ~ Stress.Level
+- Kết quả:
+F-value: 0.4414
+p-value: 0.6432
+- Nhận xét:
+Giá trị p-value = 0.6432 > 0.05, cho thấy không có sự khác biệt đáng kể về điểm hạnh phúc giữa các mức độ stress (Stress.Level). Điều này ám chỉ rằng mức độ stress không ảnh hưởng đáng kể đến điểm hạnh phúc trong mẫu này.
+
+4. Happiness.Score ~ Mental.Health.Condition
+- Kết quả:
+F-value: 0.8099
+p-value: 0.5187
+- Nhận xét:
+Giá trị p-value = 0.5187 > 0.05, cho thấy không có sự khác biệt đáng kể về điểm hạnh phúc giữa các nhóm tình trạng sức khỏe tinh thần (Mental.Health.Condition). Kết quả này có thể bất ngờ vì sức khỏe tinh thần thường được cho là có liên quan đến hạnh phúc, nhưng trong mẫu này không có sự khác biệt rõ ràng.
+
+5. Sleep.Hours ~ Exercise.Level
+- Kết quả:
+F-value: 0.4737
+p-value: 0.6227
+- Nhận xét:
+Giá trị p-value = 0.6227 > 0.05, cho thấy không có sự khác biệt đáng kể về số giờ ngủ (Sleep.Hours) giữa các mức độ tập thể dục (Exercise.Level). Điều này ám chỉ rằng mức độ tập thể dục không ảnh hưởng đến thời gian ngủ trong mẫu này.
+
+6. Sleep.Hours ~ Mental.Health.Condition
+- Kết quả:
+F-value: 0.0974
+p-value: 0.9833
+- Nhận xét:
+Giá trị p-value = 0.9833 > 0.05, cho thấy không có sự khác biệt đáng kể về số giờ ngủ giữa các nhóm tình trạng sức khỏe tinh thần (Mental.Health.Condition). Kết quả này chỉ ra rằng sức khỏe tinh thần không ảnh hưởng đến số giờ ngủ trong mẫu.
+
+7. Screen.Time.per.Day..Hours. ~ Diet.Type
+- Kết quả:
+F-value: 0.9495
+p-value: 0.4342
+- Nhận xét:
+Giá trị p-value = 0.4342 > 0.05, cho thấy không có sự khác biệt đáng kể về thời gian sử dụng màn hình mỗi ngày (Screen.Time.per.Day..Hours.) giữa các nhóm chế độ ăn (Diet.Type). Điều này ám chỉ rằng chế độ ăn không liên quan đến thời gian sử dụng màn hình.
+
+8. Work.Hours.per.Week ~ Mental.Health.Condition
+- Kết quả:
+F-value: 1.0372
+p-value: 0.3864
+- Nhận xét:
+Giá trị p-value = 0.3864 > 0.05, cho thấy không có sự khác biệt đáng kể về số giờ làm việc mỗi tuần (Work.Hours.per.Week) giữa các nhóm tình trạng sức khỏe tinh thần (Mental.Health.Condition). Kết quả này cho thấy sức khỏe tinh thần không ảnh hưởng đến số giờ làm việc.
+
+9. Social.Interaction.Score ~ Stress.Level
+- Kết quả:
+F-value: 0.6897
+p-value: 0.5018
+- Nhận xét:
+Giá trị p-value = 0.5018 > 0.05, cho thấy không có sự khác biệt đáng kể về điểm tương tác xã hội (Social.Interaction.Score) giữa các mức độ stress (Stress.Level). Điều này ám chỉ rằng mức độ stress không ảnh hưởng đến mức độ tương tác xã hội trong mẫu.
+
+10. Age ~ Exercise.Level
+- Kết quả:
+F-value: 1.2461
+p-value: 0.2878
+- Nhận xét:
+Giá trị p-value = 0.2878 > 0.05, cho thấy không có sự khác biệt đáng kể về tuổi (Age) giữa các mức độ tập thể dục (Exercise.Level). Kết quả này chỉ ra rằng tuổi không liên quan đến mức độ tập thể dục trong mẫu này.
+
+### 4.2.3. Kiểm định Chi bình phương 
+    Kiểm định Chi bình phương (chi-square test of independence) dùng để đánh giá xem hai biến định tính có mối liên hệ hay không. Giả thuyết không (H₀): hai biến không liên quan (độc lập); giả thuyết đối: có liên quan. Cách thức là so sánh tần suất quan sát với tần suất dự kiến khi giả định hai biến độc lập. Để kiểm định hợp lệ, mỗi ô trong bảng (giá trị dự kiến) nên lớn ít nhất 5; nếu có ô quá nhỏ, kết quả có thể không tin cậy.
+
+```{r}
+# Danh sách các cặp biến phân loại cần kiểm định
+chi_pairs <- list(
+  c("Gender", "Mental.Health.Condition"),
+  c("Exercise.Level", "Mental.Health.Condition"),
+  c("Stress.Level", "Mental.Health.Condition"),
+  c("Gender", "Exercise.Level"),
+  c("Diet.Type", "Mental.Health.Condition")
+)
+
+# Thực hiện kiểm định Chi-squared cho từng cặp
+for (pair in chi_pairs) {
+  x <- pair[1]
+  y <- pair[2]
+  cat("\n====================================\n")
+  cat("Kiểm định Chi-squared giữa:", x, "và", y, "\n")
+  
+  tbl <- table(data[[x]], data[[y]])
+  print(tbl)  # In bảng chéo
+
+  # Thực hiện kiểm định
+  result <- chisq.test(tbl)
+  print(result)
+}
+
+```
+
+Nhận xét và kết luận
+1. Kiểm định Chi-squared giữa Gender và Mental.Health.Condition
+- Kết quả:
+Test statistic (X-squared): 2.558538
+Degrees of freedom (df): 8
+P-value: 0.9589453
+- Nhận xét:
++ Giá trị p-value = 0.9589453 > 0.05, cho thấy không có đủ bằng chứng để bác bỏ giả thuyết null.
++ Không có mối quan hệ đáng kể giữa giới tính (Gender) và tình trạng sức khỏe tinh thần (Mental.Health.Condition).
++ Phân bố các tình trạng sức khỏe tinh thần (Anxiety, Bipolar, Depression, None, PTSD) là tương tự giữa các nhóm giới tính (Female, Male, Other).
+
+2. Kiểm định Chi-squared giữa Exercise.Level và Mental.Health.Condition
+- Kết quả:
+Test statistic (X-squared): 5.862553
+Degrees of freedom (df): 8
+P-value: 0.6626247
+- Nhận xét:
++ Giá trị p-value = 0.6626247 > 0.05, cho thấy không có đủ bằng chứng để bác bỏ giả thuyết null.
++ Không có mối quan hệ đáng kể giữa mức độ tập thể dục (Exercise.Level) và tình trạng sức khỏe tinh thần (Mental.Health.Condition).
++ Phân bố các tình trạng sức khỏe tinh thần là tương tự giữa các mức độ tập thể dục (High, Low, Moderate).
+
+3. Kiểm định Chi-squared giữa Stress.Level và Mental.Health.Condition
+- Kết quả:
+Test statistic (X-squared): 5.223184
+Degrees of freedom (df): 8
+P-value: 0.7334773
+- Nhận xét:
++ Giá trị p-value = 0.7334773 > 0.05, cho thấy không có đủ bằng chứng để bác bỏ giả thuyết null.
++ Không có mối quan hệ đáng kể giữa mức độ stress (Stress.Level) và tình trạng sức khỏe tinh thần (Mental.Health.Condition).
++ Phân bố các tình trạng sức khỏe tinh thần không khác biệt đáng kể giữa các mức độ stress (High, Low, Moderate).
+
+4. Kiểm định Chi-squared giữa Gender và Exercise.Level
+- Kết quả:
+Test statistic (X-squared): 1.842076
+Degrees of freedom (df): 4
+P-value: 0.7647759
+- Nhận xét:
++ Giá trị p-value = 0.7647759 > 0.05, cho thấy không có đủ bằng chứng để bác bỏ giả thuyết null.
++ Không có mối quan hệ đáng kể giữa giới tính (Gender) và mức độ tập thể dục (Exercise.Level).
++ Phân bố mức độ tập thể dục là tương tự giữa các nhóm giới tính (Female, Male, Other).
+
+5. Kiểm định Chi-squared giữa Diet.Type và Mental.Health.Condition
+- Kết quả:
+Test statistic (X-squared): 8.2064
+Degrees of freedom (df): 16
+P-value: 0.9424828
+- Nhận xét:
++ Giá trị p-value = 0.9424828 > 0.05, cho thấy không có đủ bằng chứng để bác bỏ giả thuyết null.
++ Không có mối quan hệ đáng kể giữa loại chế độ ăn (Diet.Type) và tình trạng sức khỏe tinh thần (Mental.Health.Condition).
++ Phân bố các tình trạng sức khỏe tinh thần là tương tự giữa các nhóm chế độ ăn (Balanced, Junk Food, Keto, Vegan, Vegetarian).
+
+Kết luận:
+Dựa trên các kết quả kiểm định Chi-squared, không có bằng chứng thống kê cho thấy có mối quan hệ đáng kể giữa các cặp biến sau trong tập dữ liệu:
+
+Giới tính (Gender) và tình trạng sức khỏe tinh thần (Mental.Health.Condition).
+Mức độ tập thể dục (Exercise.Level) và tình trạng sức khỏe tinh thần (Mental.Health.Condition).
+Mức độ stress (Stress.Level) và tình trạng sức khỏe tinh thần (Mental.Health.Condition).
+Giới tính (Gender) và mức độ tập thể dục (Exercise.Level).
+Loại chế độ ăn (Diet.Type) và tình trạng sức khỏe tinh thần (Mental.Health.Condition).
+
+
+# 5. Trưc quan hóa dữ liệu
+
+```{r}
+# Loading required libraries
+library(ggplot2)
+library(dplyr)
+library(corrplot)
+library(tidyr)
+```
+
+```{r}
+# Reading the dataset (assuming it's in the working directory)
+data <- read.csv("Mental_Health_Lifestyle_Dataset.csv")
+```
+
+
+## 5.1. Biểu đồ cột: Trung bình Happiness Score theo Country
+```{r}
+# Biểu đồ cột: Trung bình Happiness Score theo Country
+avg_happiness <- data %>%
+  group_by(Country) %>%
+  summarise(Avg_Happiness = mean(Happiness.Score, na.rm = TRUE))
+
+p1 <- ggplot(avg_happiness, aes(x = Country, y = Avg_Happiness, fill = Country)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Trung bình Happiness Score theo Country", x = "Country", y = "Average Happiness Score") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+- Nhận xét:
++ Điểm số khá đồng đều: Các quốc gia đều có điểm hạnh phúc trung bình dao động trong khoảng 5.5 đến 6.2, cho thấy mức độ hài lòng chung là tương đối cao và không có sự chênh lệch quá lớn.
+
++ Quốc gia có điểm cao nhất: Canada có điểm trung bình cao nhất, xấp xỉ 6.2, cho thấy người dân nước này cảm thấy hạnh phúc hơn so với các quốc gia còn lại.
+
++ Quốc gia có điểm thấp nhất: Japan (Nhật Bản) có điểm thấp nhất, khoảng 5.5, tuy vẫn ở mức tương đối nhưng thấp hơn các nước khác trong danh sách.
+
+=> Chính sách xã hội và chất lượng cuộc sống: Các quốc gia có điểm cao như Canada, Australia thường được biết đến với hệ thống phúc lợi xã hội tốt, môi trường sống an toàn và bình đẳng xã hội cao — những yếu tố này có thể góp phần lớn vào mức độ hạnh phúc chung.
+
+=> Văn hóa và áp lực xã hội: Các nước như Nhật Bản có thể có điểm thấp hơn dù là nước phát triển, có thể do áp lực công việc, văn hóa làm việc khắt khe, hay các vấn đề xã hội khác như cô lập hoặc stress.
+
+=> Gợi ý chính sách: Các nước có điểm thấp hơn có thể tham khảo các mô hình chính sách từ các quốc gia có điểm cao để cải thiện chất lượng cuộc sống cho người dân.
+
+
+## 5.2. Biểu đồ hộp (Boxplot): Sleep Hours theo Country
+```{r}
+# Biểu đồ hộp (Boxplot): Sleep Hours theo Country
+p2 <- ggplot(data, aes(x = Country, y = Sleep.Hours, fill = Country)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Sleep Hours theo Country", x = "Country", y = "Sleep Hours") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+- Nhận xét:
++ Khoảng thời gian ngủ trung vị (median): Hầu hết các quốc gia đều có giá trị trung vị (đường kẻ giữa hộp) rơi vào khoảng 6.5 đến 7 giờ. Thấp nhất có vẻ là Germany, trong khi India, Japan, Canada có xu hướng cao hơn một chút.
+
++ Phân bố khá đồng đều: Điều này cho thấy đa số người dân ở các nước này ngủ trong khoảng tương tự nhau.
+
++ Giá trị ngoại lai (outliers):
+
+Một số nước như Canada, Germany, USA có cả outliers cao (trên 9-10 giờ).
+
+Những người ngủ quá ít hoặc quá nhiều có thể do điều kiện sức khỏe, lối sống cá nhân hoặc yếu tố công việc.
+
++ Độ biến thiên (range):
+
+Các quốc gia như USA, Canada, Brazil có dải phân bố rộng hơn — thể hiện sự đa dạng lớn trong thói quen ngủ.
+
+Những quốc gia như Germany, Australia có phân bố hẹp hơn, cho thấy thói quen ngủ ở đây tương đối đồng đều.
+
+- Ý nghĩa:
++ Sức khỏe và hiệu suất sống: Giấc ngủ là yếu tố quan trọng ảnh hưởng đến sức khỏe và mức độ hạnh phúc. Việc phân tích thời lượng ngủ có thể giúp hiểu rõ hơn nguyên nhân đằng sau các mức điểm hạnh phúc khác nhau.
+
++ Chất lượng giấc ngủ không đồng nhất: Mặc dù trung bình thời gian ngủ không khác biệt nhiều giữa các nước, nhưng số lượng outliers ở mỗi quốc gia cho thấy một bộ phận dân cư có vấn đề với giấc ngủ, điều này có thể ảnh hưởng đến năng suất và tinh thần.
+
++ Đề xuất: Các quốc gia có nhiều người ngủ dưới 4 giờ nên xem xét các chiến dịch nâng cao nhận thức về tầm quan trọng của giấc ngủ hoặc cải thiện điều kiện làm việc.
+
+
+## 5.3. Biểu đồ scatter: Stress Level vs Happiness Score
+```{r}
+# 3. Biểu đồ scatter: Stress Level vs Happiness Score
+p3 <- ggplot(data, aes(x = Stress.Level, y = Happiness.Score, color = Country)) +
+  geom_point(size = 3, alpha = 0.6) +
+  theme_minimal() +
+  labs(title = "Stress Level vs Happiness Score by Country", x = "Stress Level", y = "Happiness Score") +
+  theme(legend.position = "right")
+```
+
+1. Phân bố đồng đều
+Dữ liệu của ba mức độ căng thẳng (High, Moderate, Low) đều phân bố dày đặc và đồng đều dọc theo trục Happiness Score, từ khoảng 1 đến 10.
+
+Không có mức độ căng thẳng nào thể hiện rõ sự chênh lệch đáng kể về chỉ số hạnh phúc so với các mức còn lại.
+
+2. Thiếu xu hướng rõ rệt
+Biểu đồ không cho thấy một xu hướng rõ ràng như: “căng thẳng cao thì hạnh phúc thấp”, hay “căng thẳng thấp thì hạnh phúc cao”.
+
+Điều này cho thấy rằng trong tập dữ liệu này, mức độ căng thẳng không có mối tương quan tuyến tính rõ ràng với chỉ số hạnh phúc.
+
+3. Sự đa dạng quốc gia
+Mỗi quốc gia được đại diện bằng một màu khác nhau, nhưng các điểm dữ liệu phân bố rải rác trong cả 3 nhóm căng thẳng, cho thấy không có quốc gia nào đặc biệt nổi bật ở một mức stress hay happiness cụ thể.
+
+Điều này ngụ ý rằng cả mức độ căng thẳng và hạnh phúc đều có sự biến thiên nội tại trong từng quốc gia, không nghiêng hẳn về quốc gia nào.
+
+
+
+## 5.4. Biểu đồ scatter: Work Hours vs Happiness Score
+```{r}
+# 4. Scatter plot: Work Hours vs Happiness Score, colored by Country
+p4 <- ggplot(data, aes(x = Work.Hours.per.Week, y = Happiness.Score, color = Country)) +
+  geom_point(size = 3, alpha = 0.6) +
+  theme_minimal() +
+  labs(title = "Work Hours vs Happiness Score by Country", x = "Work Hours per Week", y = "Happiness Score") +
+  theme(legend.position = "right")
+```
+
+1. Mối quan hệ giữa giờ làm việc và điểm hạnh phúc
+Không có xu hướng rõ ràng cho thấy rằng làm việc nhiều hay ít giờ có liên hệ trực tiếp đến mức độ hạnh phúc.
+
+Mức điểm hạnh phúc phân bố khá rộng và đều ở mọi mức giờ làm việc (từ 20 đến 60 giờ/tuần), nghĩa là có người hạnh phúc và không hạnh phúc ở mọi mức giờ làm.
+
+2. Sự khác biệt giữa các quốc gia
+Các chấm điểm được tô màu theo từng quốc gia và phân bố rất đều, không có quốc gia nào có sự lệch rõ rệt về giờ làm việc hoặc điểm hạnh phúc.
+
+Điều này cho thấy các quốc gia như USA, Japan, India, Germany, Canada, Brazil, Australia đều có người làm nhiều và ít giờ, và cũng có người hạnh phúc và không hạnh phúc ở các mức độ tương tự.
+
+3. Đa dạng cá nhân cao
+Biểu đồ thể hiện sự đa dạng lớn về mức độ hạnh phúc cá nhân ở cùng một mức giờ làm việc, điều này ngụ ý rằng hạnh phúc không chỉ phụ thuộc vào số giờ làm mà còn phụ thuộc vào các yếu tố khác như chất lượng công việc, thu nhập, cân bằng cuộc sống - công việc, v.v.
+
+4. Không có quốc gia vượt trội rõ rệt
+Không có màu sắc nào (quốc gia nào) nổi bật hơn hẳn về mức độ hạnh phúc cao hoặc thấp, điều này cho thấy sự khác biệt giữa các quốc gia là không lớn trong dữ liệu này.
+
+
+### 5.4.1. Line chart trung bình Work Hours và Happiness Score theo Country.
+```{r}
+# 4.1. Line chart trung bình Work Hours và Happiness Score theo Country.
+avg_work_happiness <- data %>%
+  group_by(Country) %>%
+  summarise(Avg_Work_Hours = mean(Work.Hours.per.Week, na.rm = TRUE),
+            Avg_Happiness = mean(Happiness.Score, na.rm = TRUE)) %>%
+  pivot_longer(cols = c(Avg_Work_Hours, Avg_Happiness), names_to = "Metric", values_to = "Value")
+
+p4_1 <- ggplot(avg_work_happiness, aes(x = Country, y = Value, color = Metric, group = Metric)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Average Work Hours and Happiness Score by Country", x = "Country", y = "Value") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+- Quan sát chính:
+
+Giờ làm việc trung bình của tất cả quốc gia đều rất gần nhau, dao động quanh 39–40 giờ/tuần.
+
+Chỉ số hạnh phúc có dao động nhỏ nhưng rõ hơn – nằm khoảng từ 4.5 đến 5.2 điểm.
+
+Ví dụ:
+
+Canada có vẻ có chỉ số hạnh phúc cao nhất.
+
+Japan và Brazil có chỉ số thấp hơn so với các nước còn lại.
+
+- Mối quan hệ giữa hai chỉ số:
+
+Không thấy có quan hệ rõ ràng giữa số giờ làm và độ hạnh phúc (ví dụ: làm ít hơn không chắc đã hạnh phúc hơn).
+
+Điều này gợi ý rằng hạnh phúc không chỉ phụ thuộc vào thời gian làm việc, mà còn phụ thuộc vào các yếu tố khác như môi trường sống, văn hóa, phúc lợi...
+
+
+### 5.4.2 Scatter plot Sleep Hours vs. Happiness Score (màu theo Country).
+```{r}
+# 4.5. Scatter plot Sleep Hours vs. Happiness Score (màu theo Country).
+p4_5 <- ggplot(data, aes(x = Sleep.Hours, y = Happiness.Score, color = Country)) +
+  geom_point(size = 3, alpha = 0.6) +
+  theme_minimal() +
+  labs(title = "Sleep Hours vs Happiness Score by Country", x = "Sleep Hours", y = "Happiness Score") +
+  theme(legend.position = "right")
+```
+
+1. Mối quan hệ giữa giấc ngủ và điểm hạnh phúc
+Có một xu hướng nhẹ cho thấy rằng ngủ nhiều hơn có thể liên quan đến mức độ hạnh phúc cao hơn.
+
+Đa số các điểm có hạnh phúc cao (trên 7) tập trung nhiều hơn ở vùng ngủ từ 7 đến 9 giờ.
+
+Ngược lại, những người ngủ dưới 5 giờ có xu hướng phân bố điểm hạnh phúc rộng hơn và thường thấp hơn.
+
+2. Giấc ngủ phổ biến
+Khoảng 5.5 đến 8 giờ ngủ là phổ biến nhất trong dữ liệu, chiếm mật độ điểm dày đặc nhất.
+
+Điều này phản ánh một giấc ngủ "bình thường" theo sinh lý học của người trưởng thành.
+
+3. Sự khác biệt giữa các quốc gia
+Các chấm màu đại diện cho các quốc gia như Australia, Brazil, Canada, Germany, India, Japan, USA đều phân bố khá đồng đều.
+
+Không có quốc gia nào thể hiện rõ rệt sự vượt trội hay tụt hậu về mối liên hệ giữa ngủ và hạnh phúc.
+
+4. Đa dạng về mức độ hạnh phúc
+Ngay cả với cùng một mức thời gian ngủ, mức độ hạnh phúc vẫn rất đa dạng, chứng tỏ rằng giấc ngủ chỉ là một yếu tố trong nhiều yếu tố ảnh hưởng đến hạnh phúc.
+
+5. Giấc ngủ dưới 4 giờ và trên 9 giờ là hiếm
+Có rất ít người ngủ dưới 4 hoặc trên 9 giờ, và những người này có mức độ hạnh phúc khá phân tán, không có xu hướng rõ ràng.
+
+
+### 5.4.3.  Scatter plot Social Interaction Score vs. Happiness Score.
+```{r}
+# 4.6. Scatter plot: Social Interaction Score vs Happiness Score
+p4_6 <- ggplot(data, aes(x = Social.Interaction.Score, y = Happiness.Score, color = Country)) +
+  geom_point(size = 3, alpha = 0.6) +
+  theme_minimal() +
+  labs(title = "Social Interaction Score vs Happiness Score", x = "Social Interaction Score", y = "Happiness Score") +
+  theme(legend.position = "right")
+```
+
+1. Mối quan hệ giữa giao tiếp xã hội và mức độ hạnh phúc
+Có xu hướng cho thấy mức độ tương tác xã hội cao hơn thường đi kèm với mức độ hạnh phúc cao hơn.
+
+Các điểm có hạnh phúc trên 7 tập trung khá nhiều ở vùng Social Interaction Score từ 6 trở lên, cho thấy rằng giao tiếp xã hội tích cực có thể góp phần nâng cao hạnh phúc.
+
+2. Phân bố rộng ở mọi mức độ giao tiếp
+Dù có xu hướng như trên, nhưng mức độ hạnh phúc vẫn rất đa dạng ở mọi mức giao tiếp xã hội. Tức là:
+
+Có người giao tiếp xã hội cao nhưng không hạnh phúc.
+
+Có người giao tiếp ít nhưng vẫn rất hạnh phúc.
+
+Điều này phản ánh rằng giao tiếp xã hội là một yếu tố ảnh hưởng đến hạnh phúc, nhưng không phải là yếu tố duy nhất.
+
+3. Các quốc gia phân bố đều
+Màu sắc của các quốc gia (Australia, Brazil, Canada, Germany, India, Japan, USA) được phân bố rất đồng đều trên biểu đồ.
+
+Không có quốc gia nào thể hiện sự vượt trội hay yếu kém rõ rệt trong mối quan hệ giữa giao tiếp và hạnh phúc.
+
+
+### 5.4.4. Chế độ ăn Vegan/Vegetarian có hạnh phúc hơn nhóm Junk Food không?
+```{r}
+# 4.7. Boxplot: Happiness Score by Diet Type (Vegan/Vegetarian vs Junk Food)
+diet_data <- data %>%
+  filter(Diet.Type %in% c("Vegan", "Vegetarian", "Junk Food"))
+
+p4_7 <- ggplot(diet_data, aes(x = Diet.Type, y = Happiness.Score, fill = Diet.Type)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Happiness Score by Diet Type", x = "Diet Type", y = "Happiness Score")
+```
+
+- So sánh điểm hạnh phúc trung vị giữa các nhóm ăn uống:
+Vegetarian (Ăn chay) có điểm hạnh phúc trung vị cao nhất trong 3 nhóm.
+
+Junk Food (Đồ ăn nhanh) và Vegan (Thuần chay) có mức trung vị gần nhau, nhỏ hơn nhóm Vegetarian một chút.
+
+→ Gợi ý rằng chế độ ăn chay có thể liên quan đến cảm giác hạnh phúc cao hơn so với các chế độ ăn khác.
+
+- Phân bố và biến động của điểm hạnh phúc:
+Vegetarian có dải phân bố rộng nhất, từ khoảng 2 đến gần 10, cho thấy sự đa dạng lớn trong mức độ hạnh phúc ở nhóm này.
+
+Junk Food và Vegan có dải phân bố khá tương đương, với phạm vi cũng trải dài từ khoảng 2 đến gần 9.
+
+Không có sự khác biệt cực đoan (outliers) nào đáng chú ý trong cả ba nhóm.
+
+- Kết luận tổng quan:
+Chế độ ăn có liên quan đến mức độ hạnh phúc, nhưng mức độ ảnh hưởng là nhẹ đến vừa phải.
+
+Người ăn chay (vegetarian) có xu hướng hạnh phúc hơn một chút, nhưng tác động không quá vượt trội để khẳng định chắc chắn.
+
+
+## 5.5. Bar chart: Trung bình Social Interaction Score theo Exercise Level
+```{r}
+# 5.  Bar chart: Trung bình Social Interaction Score theo Exercise Level
+avg_social_exercise <- data %>%
+  group_by(Exercise.Level) %>%
+  summarise(Avg_Social_Interaction = mean(Social.Interaction.Score, na.rm = TRUE))
+
+p5 <- ggplot(avg_social_exercise, aes(x = Exercise.Level, y = Avg_Social_Interaction, fill = Exercise.Level)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Average Social Interaction Score by Exercise Level", x = "Exercise Level", y = "Average Social Interaction Score")
+```
+
+- Quan sát chính:
+
+Người có mức độ luyện tập cao (High) có điểm tương tác xã hội trung bình cao nhất.
+
+Mức độ luyện tập trung bình (Moderate) cũng có điểm tương tác khá cao, gần bằng với mức "High".
+
+Người có mức luyện tập thấp (Low) có điểm số thấp nhất trong ba nhóm.
+
+- Kết luận:
+
+Có vẻ có mối liên hệ tích cực giữa mức độ luyện tập thể dục và khả năng tương tác xã hội: Càng vận động nhiều thì xu hướng tương tác xã hội càng cao.
+
+Điều này có thể do việc luyện tập giúp cải thiện tâm trạng, sự tự tin, sức khỏe — từ đó làm tăng nhu cầu và khả năng giao tiếp với người khác.
+
+
+## 5.6. Bar chart: Tỷ lệ Mental Health Condition theo Country
+```{r}
+# 6. Bar chart: Tỷ lệ Mental Health Condition theo Country
+mental_health_prop <- data %>%
+  group_by(Country, Mental.Health.Condition) %>%
+  summarise(Count = n()) %>%
+  mutate(Proportion = Count / sum(Count))
+
+p6 <- ggplot(mental_health_prop, aes(x = Country, y = Proportion, fill = Mental.Health.Condition)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Proportion of Mental Health Conditions by Country", x = "Country", y = "Proportion") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+- Tình trạng sức khỏe tâm thần phổ biến nhất:
+Anxiety (Lo âu) có tỷ lệ cao nhất trong hầu hết các quốc gia, chiếm khoảng 20-25% tổng số người khảo sát.
+
+Các tình trạng khác như Depression (Trầm cảm), PTSD, và Bipolar có tỷ lệ tương đối đồng đều.
+
+- Nhận xét chung:
+Mỗi quốc gia đều có tỷ lệ người mắc một hoặc nhiều loại rối loạn tâm thần chiếm hơn 75%, chỉ khoảng 25% là không gặp vấn đề gì (“None”).
+
+Điều này cho thấy sức khỏe tâm thần là một vấn đề toàn cầu, không phụ thuộc quá nhiều vào khu vực địa lý.
+
+
+## 5.7. Boxplot Happiness Score theo Country
+```{r}
+# 7. Boxplot Happiness Score theo Country
+p7 <- ggplot(data, aes(x = Country, y = Happiness.Score, fill = Country)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Happiness Score Distribution by Country", x = "Country", y = "Happiness Score") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+- Phân tích Phân Tán (Spread):
+Tất cả các quốc gia đều có khoảng giá trị tương đối rộng (IQR lớn), cho thấy sự đa dạng lớn trong mức độ hạnh phúc giữa các cá nhân trong cùng một quốc gia.
+
+India và Japan có phần đuôi dưới khá dài → có nhiều cá nhân đánh giá mức độ hạnh phúc rất thấp.
+
+- Tổng kết nhanh:
+Australia và Canada có mức độ hạnh phúc cao nhất và ổn định hơn.
+
+Japan và India là hai quốc gia có trung vị thấp và phân bố trải dài — cần nghiên cứu sâu hơn vì sao lại như vậy (có thể do áp lực xã hội, công việc, hoặc các vấn đề về sức khỏe tâm thần như biểu đồ trước đó đã gợi ý).
+
+
+## 5.8. Phân bố các biến Mental Health Condition quan trọng
+```{r}
+# 8. Bar plot: Phân bố các biến Mental Health Condition quan trọng
+p8 <- ggplot(data, aes(x = Mental.Health.Condition, fill = Mental.Health.Condition)) +
+  geom_bar() +
+  theme_minimal() +
+  labs(title = "Distribution of Mental Health Conditions", x = "Mental Health Condition", y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Một số nhận xét quan trọng:
+Tỷ lệ người gặp các vấn đề sức khỏe tâm thần (Anxiety, PTSD, Depression, Bipolar) cao hơn đáng kể so với người không có vấn đề nào.
+
+Anxiety là loại bệnh phổ biến nhất, điều này phù hợp với nhiều nghiên cứu thực tế về sức khỏe tinh thần hiện nay.
+
+PTSD khá cao, điều này có thể cho thấy sự phổ biến của các sự kiện gây sang chấn hoặc áp lực tinh thần nghiêm trọng.
+
+Người "không có" vấn đề sức khỏe tâm thần chỉ chiếm thiểu số (~20%), có thể chỉ ra mức độ căng thẳng và áp lực phổ biến trong xã hội hiện đại.
+
+
+## 5.9. Heatmap tương quan giữa các biến numeric (Age, Sleep Hours, Work Hours, Happiness Score).
+```{r}
+# 9. Heatmap tương quan giữa các biến numeric (Age, Sleep Hours, Work Hours, Happiness Score).
+numeric_vars <- data %>%
+  select(Age, Sleep.Hours, Work.Hours.per.Week, Screen.Time.per.Day..Hours., Social.Interaction.Score, Happiness.Score)
+
+corr_matrix <- cor(numeric_vars, use = "complete.obs")
+
+p9 <- corrplot(corr_matrix, method = "color", type = "upper", 
+               tl.col = "black", tl.srt = 45, 
+               addCoef.col = "black", number.cex = 0.7,
+               title = "Bản Đồ Nhiệt Tương Quan Các Biến Số")
+```
+
+
+```{r}
+# Print plots to console (for interactive use)
+print(p1)
+print(p2)
+print(p3)
+print(p4)
+print(p4_1)
+print(p4_5)
+print(p4_6)
+print(p4_7)
+print(p5)
+print(p6)
+print(p7)
+print(p8)
+```
+
